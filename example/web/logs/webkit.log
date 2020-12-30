@@ -1,0 +1,42 @@
+2020-12-28 16:00:27	INFO	web/gin.go:57	/test/3	{"S": 200, "M": "GET", "T": "177.356µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:00:27	INFO	web/gin.go:57	/test/3	{"S": 200, "M": "GET", "T": "10.093µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:00:28	INFO	web/gin.go:57	/test/3	{"S": 200, "M": "GET", "T": "9.948µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:01:29	INFO	web/gin.go:57	/test/3	{"S": 200, "M": "GET", "T": "128.352µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:01:29	INFO	web/gin.go:57	/test/3	{"S": 200, "M": "GET", "T": "47.95µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:01:37	ERROR	web/gin.go:95	/test/0	 runtime error: integer divide by zero
+main.main.func1(0xc00033e000)
+	/Users/lorin/Documents/go/webkit/example/web/main.go:17 +0x1b5
+github.com/gin-gonic/gin.(*Context).Next(0xc00033e000)
+	/Users/lorin/go/pkg/mod/github.com/gin-gonic/gin@v1.6.3/context.go:161 +0x3b
+webkit/web.setGinRecovery.func1(0xc00033e000)
+	/Users/lorin/Documents/go/webkit/web/gin.go:102 +0x68
+github.com/gin-gonic/gin.(*Context).Next(0xc00033e000)
+	/Users/lorin/go/pkg/mod/github.com/gin-gonic/gin@v1.6.3/context.go:161 +0x3b
+webkit/web.setGinLog.func1(0xc00033e000)
+	/Users/lorin/Documents/go/webkit/web/gin.go:43 +0xb1
+github.com/gin-gonic/gin.(*Context).Next(0xc00033e000)
+	/Users/lorin/go/pkg/mod/github.com/gin-gonic/gin@v1.6.3/context.go:161 +0x3b
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc0000c4280, 0xc00033e000)
+	/Users/lorin/go/pkg/mod/github.com/gin-gonic/gin@v1.6.3/gin.go:409 +0x666
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc0000c4280, 0x1731fc0, 0xc0003380e0, 0xc000316200)
+	/Users/lorin/go/pkg/mod/github.com/gin-gonic/gin@v1.6.3/gin.go:367 +0x14d
+net/http.serverHandler.ServeHTTP(0xc0000de0e0, 0x1731fc0, 0xc0003380e0, 0xc000316200)
+	/usr/local/go/src/net/http/server.go:2807 +0xa3
+net/http.(*conn).serve(0xc0000c2460, 0x1733a40, 0xc000304080)
+	/usr/local/go/src/net/http/server.go:1895 +0x86c
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2933 +0x35c
+	{"REQUEST": "GET /test/0?ip=1&aa=1 HTTP/1.1\r\nHost: localhost:8996\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: zh-CN,zh;q=0.9,en;q=0.8\r\nConnection: keep-alive\r\nCookie: Hm_lvt_d214947968792b839fd669a4decaaffc=1596037028; _ga=GA1.1.995402100.1596682074; i18n_redirected=cn; Goland-c3c53ea0=7cb3fa23-4bc1-4ed8-ba84-80533da262cf; Hm_lvt_bc38887aa5588add05a38704342ad7e8=1603270113\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: none\r\nSec-Fetch-User: ?1\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36\r\n\r\n"}
+2020-12-28 16:01:37	INFO	web/gin.go:57	/test/0	{"S": 500, "M": "GET", "T": "592.185µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:03:17	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:03:17	INFO	web/gin.go:57	/test/0	{"S": 200, "M": "GET", "T": "415.456µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:07:44	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:07:44	INFO	web/gin.go:57	/test/0	{"S": 200, "M": "GET", "T": "610.467µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:07:45	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:07:45	INFO	web/gin.go:57	/test/0	{"S": 200, "M": "GET", "T": "84.671µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:09:47	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:09:47	INFO	web/logger.go:35	/test/0	{"S": 200, "M": "GET", "T": "381.221µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:10:18	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:10:18	INFO	web/log.go:35	/test/0	{"S": 200, "M": "GET", "T": "406.29µs", "Q": "ip=1&aa=1", "IP": "::1"}
+2020-12-28 16:10:19	INFO	web/main.go:15	params	{"num": "0"}
+2020-12-28 16:10:19	INFO	web/log.go:35	/test/0	{"S": 200, "M": "GET", "T": "70.755µs", "Q": "ip=1&aa=1", "IP": "::1"}
