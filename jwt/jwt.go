@@ -2,6 +2,8 @@ package jwt
 
 import (
 	"crypto/rsa"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -66,33 +68,81 @@ func readKeyFile(path string) []byte {
 	return keyByte
 }
 
+/**
+ * 根据初始化的配置，生成token
+ */
 func Gen(data interface{}) (string, error) {
+	return CustomGen(data, o.expire, o.secret)
+}
+
+/**
+ * 根据初始化的配置，解析token
+ */
+func Parse(tokenStr string) (map[string]interface{}, error) {
+	return CustomParse(tokenStr, o.secret)
+}
+
+/**
+ * 生成token
+ */
+func CustomGen(data interface{}, expire time.Duration, secret []byte) (string, error) {
 	j := Jwt{
 		Data: data,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(o.expire).Unix(), // 过期时间
+			ExpiresAt: time.Now().Add(expire).Unix(), // 过期时间
 		},
 	}
 	// 使用jwt库中已有的签名方法创建签名对象
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, j)
 	// 使用指定的secret签名并获得完整的编码后的字符串token
-	return token.SignedString(o.secret)
+	return token.SignedString(secret)
 }
 
-func Parse(tokenStr string) (map[string]interface{}, error) {
-	// 解析token
+/**
+ * 校验token有效性，并返回token中的数据
+ */
+func CustomParse(tokenStr string, secret []byte) (map[string]interface{}, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &Jwt{}, func(token *jwt.Token) (i interface{}, err error) {
-		return o.secret, nil
+		return secret, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	if claims, ok := token.Claims.(*Jwt); ok && token.Valid { // 校验token
+	if claims, ok := token.Claims.(*Jwt); ok && token.Valid {
 		res := claims.Data.(map[string]interface{})
 		res["expiresAt"] = claims.ExpiresAt
 		return res, nil
 	}
 	return nil, errors.New("invalid token")
+}
+
+/**
+ * 只校验token有效性，不返回token中的数据
+ */
+func Verify(tokenStr string, secret []byte) bool {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (i interface{}, err error) {
+		return secret, nil
+	})
+	if err == nil {
+		return token.Valid
+	}
+	return false
+}
+
+/**
+ * 不校验token有效性，返回token中的数据
+ */
+func Data(token string) (map[string]interface{}, error) {
+	split := strings.Split(token, ".")
+	if len(split) > 1 {
+		decodeStr, err := base64.StdEncoding.DecodeString(split[1])
+		j := &Jwt{}
+		json.Unmarshal(decodeStr, j)
+		data := j.Data.(map[string]interface{})
+		data["expiresAt"] = j.ExpiresAt
+		return data, err
+	}
+	return nil, nil
 }
 
 func RsaGen(data interface{}) (string, error) {

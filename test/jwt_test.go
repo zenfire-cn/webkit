@@ -7,25 +7,36 @@ import (
 	"time"
 )
 
-func init() {
-	jwt.Init(time.Hour*2, "mySecret")
-}
-
 type testStruct struct {
 	Name string
-	Age int
+	Age  int
 }
 
-func TestGen(t *testing.T) {
-	t.Run("TestGen", func(t *testing.T) {
-		token, err := jwt.Gen(&testStruct{"Lorin", 22})
-		fmt.Println(token, err)
-	})
+func TestGenAndParse(t *testing.T) {
+	// 初始化
+	jwt.Init(time.Hour*2, "mySecret")
+	// 生成token
+	token, err := jwt.Gen(&testStruct{"Lorin", 22})
+	fmt.Println(token, err)
+	// 解析token
+	res, err := jwt.Parse(token)
+	fmt.Println(res, err)
 }
 
-func TestParse(t *testing.T) {
-	t.Run("TestParse", func(t *testing.T) {
-		res, err := jwt.Parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJEYXRhIjp7Ik5hbWUiOiJMb3JpbiIsIkFnZSI6MjJ9LCJleHAiOjE2MDkyMzM5MTN9.56n-pHdWPpR8I9INQLCyyvVzVUf43y9jUbO01X6X1qw")
-		fmt.Println(res, err)
-	})
+func TestData(t *testing.T) {
+	data, err := jwt.Data("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJEYXRhIjp7Ik5hbWUiOiJMb3JpbiIsIkFnZSI6MjJ9LCJleHAiOjE2MTE3MTgwNjV9.OI2u19Z5M6b5U1-vtI5AUNMD9gSOPvHCJqXlBxDfQJk")
+	fmt.Println(data, err)
+}
+
+func TestCustom(t *testing.T) {
+	data := &testStruct{"Lorin", 22}
+	secret := []byte("secret")
+
+	token, err := jwt.CustomGen(data, time.Minute, secret)
+	fmt.Println("token:", token, "err:", err)
+
+	verify := jwt.Verify(token, secret)
+	fmt.Println("verify:", verify)
+
+	fmt.Println(jwt.Data(token))
 }

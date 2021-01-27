@@ -25,4 +25,5 @@ func main() {
 	// 解析token
 	res, err := jwt.Parse(token)
 	fmt.Println(res, err)
+
 }
