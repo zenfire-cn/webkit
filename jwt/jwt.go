@@ -19,6 +19,7 @@ import (
 type Jwt struct {
 	Data interface{}
 	jwt.StandardClaims
+	Iss string `json:"iss"`
 }
 
 type option struct {
@@ -27,6 +28,7 @@ type option struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
 	rsa        bool
+	Iss        string
 }
 
 var (
@@ -39,6 +41,10 @@ func Init(expire time.Duration, secret string) {
 		expire: expire,
 		secret: []byte(secret),
 	}
+}
+
+func SetIss(iss string) {
+	o.Iss = iss
 }
 
 func RsaInit(expire time.Duration, publicKey, privateKey string) {
@@ -72,7 +78,7 @@ func readKeyFile(path string) []byte {
  * 根据初始化的配置，生成token
  */
 func Gen(data interface{}) (string, error) {
-	return CustomGen(data, o.expire, o.secret)
+	return CustomGen(data, o.expire, o.secret, o.Iss)
 }
 
 /**
@@ -85,16 +91,16 @@ func Parse(tokenStr string) (map[string]interface{}, error) {
 /**
  * 生成token
  */
-func CustomGen(data interface{}, expire time.Duration, secret []byte) (string, error) {
+func CustomGen(data interface{}, expire time.Duration, secret []byte, iss string) (string, error) {
 	j := Jwt{
 		Data: data,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(expire).Unix(), // 过期时间
 		},
+		Iss: iss,
 	}
-	// 使用jwt库中已有的签名方法创建签名对象
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, j)
-	// 使用指定的secret签名并获得完整的编码后的字符串token
 	return token.SignedString(secret)
 }
 
@@ -130,19 +136,19 @@ func Verify(tokenStr string, secret []byte) bool {
 }
 
 /**
- * 不校验token有效性，返回token中的数据
+ * 不校验token有效性，直接获取token payload中的数据
  */
 func Data(token string) (map[string]interface{}, error) {
 	split := strings.Split(token, ".")
 	if len(split) > 1 {
-		decodeStr, err := base64.StdEncoding.DecodeString(split[1])
+		decodeStr, err := base64.RawStdEncoding.DecodeString(split[1])
 		j := &Jwt{}
 		json.Unmarshal(decodeStr, j)
 		data := j.Data.(map[string]interface{})
 		data["expiresAt"] = j.ExpiresAt
 		return data, err
 	}
-	return nil, nil
+	return nil, errors.New("invalid token")
 }
 
 func RsaGen(data interface{}) (string, error) {
@@ -175,19 +181,22 @@ func RsaParse(tokenStr string) (map[string]interface{}, error) {
 	return nil, errors.New("invalid token")
 }
 
+/**
+ * gin路由中间件
+ */
 func Auth(validations ...interface{}) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// 从请求头中获取token
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" {
-			rest.Error(c, "请求头中auth为空")
+			rest.Error(c, "请求头缺少Authorization字段")
 			c.Abort()
 			return
 		}
 		// "Bearer tokenString..." 按空格分割
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			rest.Error(c, "请求头中auth格式有误")
+			rest.Error(c, "请求头Authorization字段格式有误")
 			c.Abort()
 			return
 		}
@@ -204,7 +213,7 @@ func Auth(validations ...interface{}) func(c *gin.Context) {
 		}
 
 		if err != nil {
-			rest.Error(c, "无效的token")
+			rest.Error(c, "invalid token")
 			c.Abort()
 			return
 		}

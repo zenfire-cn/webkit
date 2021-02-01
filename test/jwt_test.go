@@ -30,9 +30,9 @@ func TestData(t *testing.T) {
 
 func TestCustom(t *testing.T) {
 	data := &testStruct{"Lorin", 22}
-	secret := []byte("secret")
+	secret := []byte("I4U3WeVORdNo3tPCVAQZQ2eMMAhmaIon")
 
-	token, err := jwt.CustomGen(data, time.Minute, secret)
+	token, err := jwt.CustomGen(data, time.Hour*2, secret, "z5VJ7uSiotC9Qqqz12YrC7Vgn53Ex7HV")
 	fmt.Println("token:", token, "err:", err)
 
 	verify := jwt.Verify(token, secret)
