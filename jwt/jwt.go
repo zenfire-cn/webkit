@@ -23,12 +23,14 @@ type Jwt struct {
 }
 
 type option struct {
-	expire     time.Duration
-	secret     []byte
-	publicKey  *rsa.PublicKey
-	privateKey *rsa.PrivateKey
-	rsa        bool
-	Iss        string
+	expire      time.Duration
+	secret      []byte
+	publicKey   *rsa.PublicKey
+	privateKey  *rsa.PrivateKey
+	ExpiredCode int
+	ExpiredMsg  string
+	rsa         bool
+	Iss         string
 }
 
 var (
@@ -38,8 +40,10 @@ var (
 
 func Init(expire time.Duration, secret string) {
 	o = &option{
-		expire: expire,
-		secret: []byte(secret),
+		expire:      expire,
+		secret:      []byte(secret),
+		ExpiredCode: 510,
+		ExpiredMsg:  "",
 	}
 }
 
@@ -47,11 +51,18 @@ func SetIss(iss string) {
 	o.Iss = iss
 }
 
+func SetExpiredCodeAndMsg(code int, msg string) {
+	o.ExpiredCode = code
+	o.ExpiredMsg = msg
+}
+
 func RsaInit(expire time.Duration, publicKey, privateKey string) {
 	pub, _ := jwt.ParseRSAPublicKeyFromPEM(readKeyFile(publicKey))
 	pri, _ := jwt.ParseRSAPrivateKeyFromPEM(readKeyFile(privateKey))
 	o = &option{
 		expire:     expire,
+		ExpiredCode: 510,
+		ExpiredMsg:  "",
 		publicKey:  pub,
 		privateKey: pri,
 		rsa:        true,
@@ -213,7 +224,7 @@ func Auth(validations ...interface{}) func(c *gin.Context) {
 		}
 
 		if err != nil {
-			rest.Error(c, "invalid token")
+			rest.New(c, o.ExpiredCode, nil, o.ExpiredMsg)
 			c.Abort()
 			return
 		}
