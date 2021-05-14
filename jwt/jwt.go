@@ -43,7 +43,7 @@ func Init(expire time.Duration, secret string) {
 		expire:      expire,
 		secret:      []byte(secret),
 		ExpiredCode: 510,
-		ExpiredMsg:  "",
+		ExpiredMsg:  "invalid token",
 	}
 }
 
@@ -62,7 +62,7 @@ func RsaInit(expire time.Duration, publicKey, privateKey string) {
 	o = &option{
 		expire:     expire,
 		ExpiredCode: 510,
-		ExpiredMsg:  "",
+		ExpiredMsg:  "invalid token",
 		publicKey:  pub,
 		privateKey: pri,
 		rsa:        true,
